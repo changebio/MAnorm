@@ -10,7 +10,7 @@ from peaks import Peak, get_peaks_mavalues, get_peaks_normed_mavalues, get_peaks
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
-
+import pysam
 
 def _get_reads_position(reads_fp, shift):
     """
@@ -34,6 +34,25 @@ def _get_reads_position(reads_fp, shift):
     # 返回排序后的reads的位点信息
     return {key: sorted(position[key]) for key in position.keys()}
 
+def _get_bam_position(reads_fp,shift):
+    """
+    read bam file
+    :param reads_fp: <str>read file path
+    :param shift: <int>The arbitrary shift size in bp
+    :return: all read position after shift
+    """
+    position = {}    
+    with pysam.AlignmentFile(reads_fp,"rb") as samfile:
+        for read in samfile.fetch():
+            chrm,start,end,strand = samfile.getrname(read.tid),read.pos,read.aend,"-" if read.is_reverse==True else "+"
+            pos = start + shift if strand is "+" else end - shift
+            try:
+                position[chrm].append(pos)
+            except KeyError:
+                position[chrm]=[]
+                position[chrm].append(pos)
+        return {key: sorted(position[key]) for key in position.keys()}
+            
 
 def _get_read_length(reads_fp):
     """
@@ -48,7 +67,13 @@ def _get_read_length(reads_fp):
 
 
 def read_reads(reads_fp, shift):
-    return _get_reads_position(reads_fp, shift)
+    if ".bed" in reads_fp :
+        return _get_reads_position(reads_fp, shift)
+    elif ".bam" in reads_fp :
+        return _get_bam_position(reads_fp,shift)
+    else :
+        print "please get right read input"
+    
 
 
 def _read_peaks(peak_fp):
