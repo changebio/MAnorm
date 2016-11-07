@@ -67,11 +67,11 @@ def _get_read_length(reads_fp):
 
 
 def read_reads(reads_fp, shift):
-    if ".bed" in reads_fp :
+    if ".bed" in reads_fp:
         return _get_reads_position(reads_fp, shift)
-    elif ".bam" in reads_fp :
+    elif ".bam" in reads_fp:
         return _get_bam_position(reads_fp,shift)
-    else :
+    else:
         print "please get right read input"
     
 

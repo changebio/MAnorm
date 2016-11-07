@@ -21,6 +21,12 @@ install_requires = [
     'numpy',
     'scipy',
     'pandas',
+    "bisect",
+    "math",
+    "random",
+    "statsmodels",
+    "matplotlib",
+    "pysam"
 ]
 
 
